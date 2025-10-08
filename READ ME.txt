@@ -1,0 +1,19 @@
+# 📚 PLP Bookstore - MongoDB Project
+
+## 🚀 Overview
+This project demonstrates MongoDB fundamentals — CRUD operations, advanced queries, aggregation pipelines, and indexing optimization.
+
+---
+
+## 🛠️ Setup Instructions
+
+### 1. Install MongoDB
+- Option 1: Install **MongoDB Community Edition** locally  
+- Option 2: Sign up for **MongoDB Atlas** → [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas)
+
+---
+
+### 2. Create Database and Collection
+```bash
+use plp_bookstore
+db.createCollection("books")
