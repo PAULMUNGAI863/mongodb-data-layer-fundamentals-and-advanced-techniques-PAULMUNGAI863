@@ -1,0 +1,95 @@
+// queries.js
+
+use("plp_bookstore");
+
+//
+// --- BASIC CRUD OPERATIONS ---
+//
+
+// 1. Find all books in a specific genre (e.g., "Thriller")
+db.books.find({ genre: "Thriller" });
+
+// 2. Find books published after a certain year (e.g., 2010)
+db.books.find({ published_year: { $gt: 2010 } });
+
+// 3. Find books by a specific author
+db.books.find({ author: "George Orwell" });
+
+// 4. Update the price of a specific book
+db.books.updateOne(
+  { title: "1984" },
+  { $set: { price: 15.5 } }
+);
+
+// 5. Delete a book by its title
+db.books.deleteOne({ title: "The Great Gatsby" });
+
+
+//
+// --- ADVANCED QUERIES ---
+//
+
+// 6. Find books that are in stock and published after 2010
+db.books.find({ in_stock: true, published_year: { $gt: 2010 } });
+
+// 7. Projection to return only title, author, and price
+db.books.find({}, { title: 1, author: 1, price: 1, _id: 0 });
+
+// 8. Sort by price ascending
+db.books.find().sort({ price: 1 });
+
+// 9. Sort by price descending
+db.books.find().sort({ price: -1 });
+
+// 10. Pagination (5 books per page)
+// Page 1
+db.books.find().limit(5);
+// Page 2
+db.books.find().skip(5).limit(5);
+
+
+//
+// --- AGGREGATION PIPELINES ---
+//
+
+// 11. Average price of books by genre
+db.books.aggregate([
+  { $group: { _id: "$genre", avgPrice: { $avg: "$price" } } }
+]);
+
+// 12. Author with the most books
+db.books.aggregate([
+  { $group: { _id: "$author", totalBooks: { $sum: 1 } } },
+  { $sort: { totalBooks: -1 } },
+  { $limit: 1 }
+]);
+
+// 13. Group books by publication decade and count them
+db.books.aggregate([
+  {
+    $project: {
+      decade: {
+        $concat: [
+          { $toString: { $multiply: [{ $floor: { $divide: ["$published_year", 10] } }, 10] } },
+          "s"
+        ]
+      }
+    }
+  },
+  { $group: { _id: "$decade", totalBooks: { $sum: 1 } } },
+  { $sort: { _id: 1 } }
+]);
+
+
+//
+// --- INDEXING ---
+//
+
+// 14. Create an index on the title field
+db.books.createIndex({ title: 1 });
+
+// 15. Create a compound index on author and published_year
+db.books.createIndex({ author: 1, published_year: -1 });
+
+// 16. Use explain() to demonstrate performance improvement
+db.books.find({ title: "1984" }).explain("executionStats");
